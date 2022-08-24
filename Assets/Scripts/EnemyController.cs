@@ -6,7 +6,7 @@ public class EnemyController : MonoBehaviour
 {
     Vector3 StartPos;
     bool Check;
-    public float speed;
+    public float speed, Dest;
     private void Start()
     {
         StartPos = transform.position;
@@ -14,6 +14,8 @@ public class EnemyController : MonoBehaviour
             Check = true;
         else if (StartPos.x > 0)
             Check = false;
+
+        Destroy(gameObject, Dest);
     }
 
     private void FixedUpdate()

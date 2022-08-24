@@ -8,8 +8,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] FixedJoystick fixJoy;
     [SerializeField] float speed;
     [SerializeField] Animator anim;
-    public bool JoyGoes;
-    [SerializeField] GameObject Spawn, YouLoosePan;
+    public bool isDead;
+    [SerializeField] GameObject Spawn, FightSpawn, YouLoosePan, YouWinPan;
 
     void FixedUpdate()
     {
@@ -44,20 +44,32 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if(collision.collider.tag == "Enemy")
+        if (other.tag == "Enemy")
         {
             anim.SetBool("Death", true);
+            isDead = true;
+            Destroy(other.gameObject);
             YouLoosePan.SetActive(true);
         }
+        else if(other.tag == "Finish" && !isDead)
+        {
+            YouWinPan.SetActive(true);
+        }
     }
-   
-    
+
     public void Death()
     {
         anim.SetBool("Death", false);
         transform.position = Spawn.transform.position;
         YouLoosePan.SetActive(false);
+        isDead = false;
+    }
+
+    public void GoToFight()
+    {
+        YouWinPan.SetActive(false);
+        transform.position = FightSpawn.transform.position;
     }
 }
