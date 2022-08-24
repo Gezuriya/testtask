@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
     public bool isDead, Finished, CanMove, Fight, canAttack, damaged;
     [SerializeField] GameObject Spawn, FightSpawn, YouLoosePan, YouWinPan;
 
-    [SerializeField] GameObject AttackButton, hpBarCanvas, bossPref;
+    [SerializeField] GameObject AttackButton, hpBarCanvas, bossPref, chestButton;
     [SerializeField] Image HpBar;
     int Lifes;
     public int BossKilled;
@@ -27,7 +27,10 @@ public class PlayerController : MonoBehaviour
     }
     void FixedUpdate()
     {
-
+        if(BossKilled == 2)
+        {
+            AttackButton.SetActive(false);
+        }
         if (CanMove)
         {
             rig.velocity = new Vector3(fixJoy.Horizontal * speed, rig.velocity.y, fixJoy.Vertical * speed);
@@ -72,7 +75,14 @@ public class PlayerController : MonoBehaviour
         }
         else if(other.tag == "Chest")
         {
-
+            chestButton.SetActive(true);
+        }
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.tag == "Chest")
+        {
+            chestButton.SetActive(false);
         }
     }
     private void OnCollisionEnter(Collision collision)
@@ -163,5 +173,10 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         anim.SetInteger("Attack", 0);
         canAttack = true;
+    }
+
+    public void ChestTrig()
+    {
+
     }
 }

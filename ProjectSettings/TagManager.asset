@@ -9,6 +9,7 @@ TagManager:
   - Boss
   - Rist
   - ToDestroy
+  - Chest
   layers:
   - Default
   - TransparentFX

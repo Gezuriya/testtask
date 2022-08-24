@@ -9,24 +9,40 @@ public class BossController : MonoBehaviour
     [SerializeField] Image HpBar;
     int Lifes;
     [SerializeField] GameObject chest;
+    GameObject Player;
+    bool canGet;
     private void Start()
     {
+        canGet = true;
+        Player = GameObject.FindGameObjectWithTag("Player");
         Lifes = 5;
         HpBar.fillAmount = 1;
         StartCoroutine(BossAttack());
     }
+    private void FixedUpdate()
+    {
+        transform.LookAt(Player.transform);
+
+    }
     private void OnCollisionEnter(Collision collision)
     {
-        if(collision.collider.tag == "Rist" && FindObjectOfType<PlayerController>().canAttack == false)
+        if(collision.collider.tag == "Rist" && Player.GetComponent<PlayerController>().canAttack == false && canGet)
         {
             Lifes--;
             HpBar.fillAmount -= 0.2f;
-            if(Lifes == 0)
+            if(Lifes <= 0)
             {
-                anim.SetBool("Death", true);
-                Invoke("BossDeath", 2);
+                StopAllCoroutines();
+                StartCoroutine(BossDeath());
             }
+            canGet = false;
+            StartCoroutine(GetDamage());
         }
+    }
+    IEnumerator GetDamage()
+    {
+        yield return new WaitForSeconds(0.35f);
+        canGet = true;
     }
     IEnumerator BossAttack()
     {
@@ -38,10 +54,12 @@ public class BossController : MonoBehaviour
             anim.SetBool("Attack", false);
         }
     }
-    void BossDeath()
+    IEnumerator BossDeath()
     {
-        FindObjectOfType<PlayerController>().BossKilled++;
-        if(FindObjectOfType<PlayerController>().BossKilled == 2)
+        anim.SetBool("Death", true);
+        yield return new WaitForSeconds(2);
+        Player.GetComponent<PlayerController>().BossKilled++;
+        if(Player.GetComponent<PlayerController>().BossKilled == 2)
         {
             Instantiate(chest, transform.position, Quaternion.Euler(0,180,0));
         }
