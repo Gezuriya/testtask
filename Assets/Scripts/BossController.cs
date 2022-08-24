@@ -10,7 +10,7 @@ public class BossController : MonoBehaviour
     int Lifes;
     [SerializeField] GameObject chest;
     GameObject Player;
-    bool canGet;
+    bool canGet, isDead;
     private void Start()
     {
         canGet = true;
@@ -21,8 +21,8 @@ public class BossController : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        if(!isDead)
         transform.LookAt(Player.transform);
-
     }
     private void OnCollisionEnter(Collision collision)
     {
@@ -30,18 +30,20 @@ public class BossController : MonoBehaviour
         {
             Lifes--;
             HpBar.fillAmount -= 0.2f;
-            if(Lifes <= 0)
-            {
-                StopAllCoroutines();
-                StartCoroutine(BossDeath());
-            }
             canGet = false;
             StartCoroutine(GetDamage());
+            if(Lifes == 0)
+            {
+                anim.SetBool("Death", true);
+                StopAllCoroutines();
+                StartCoroutine(BossDeath());
+                isDead = true;
+            }
         }
     }
     IEnumerator GetDamage()
     {
-        yield return new WaitForSeconds(0.35f);
+        yield return new WaitForSeconds(0.4f);
         canGet = true;
     }
     IEnumerator BossAttack()
@@ -56,8 +58,7 @@ public class BossController : MonoBehaviour
     }
     IEnumerator BossDeath()
     {
-        anim.SetBool("Death", true);
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(3);
         Player.GetComponent<PlayerController>().BossKilled++;
         if(Player.GetComponent<PlayerController>().BossKilled == 2)
         {
