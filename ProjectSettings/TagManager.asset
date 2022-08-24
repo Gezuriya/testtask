@@ -7,6 +7,8 @@ TagManager:
   - Enemy
   - PlayerHands
   - Boss
+  - Rist
+  - ToDestroy
   layers:
   - Default
   - TransparentFX

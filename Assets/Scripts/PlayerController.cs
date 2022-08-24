@@ -9,34 +9,25 @@ public class PlayerController : MonoBehaviour
     [SerializeField] FixedJoystick fixJoy;
     [SerializeField] float speed;
     [SerializeField] Animator anim;
-    public bool isDead, Finished, CanMove, Fight;
+    public bool isDead, Finished, CanMove, Fight, canAttack, damaged;
     [SerializeField] GameObject Spawn, FightSpawn, YouLoosePan, YouWinPan;
 
-    [SerializeField] GameObject AttackButton, hpBarCanvas;
+    [SerializeField] GameObject AttackButton, hpBarCanvas, bossPref;
     [SerializeField] Image HpBar;
     int Lifes;
+    public int BossKilled;
+
+    public int AttackValue;
 
     private void Start()
     {
+        BossKilled = 0;
         Lifes = 10;
         CanMove = true;
     }
     void FixedUpdate()
     {
-        /*  if (PlayerHealth == 0)
-          {
-              Death();
-          }
 
-          if (damaged)
-          {
-              damageImage.color = flashColour;
-          }
-          else
-          {
-              damageImage.color = Color.Lerp(damageImage.color, Color.clear, flashSpeed * Time.deltaTime);
-          }
-          damaged = false;*/
         if (CanMove)
         {
             rig.velocity = new Vector3(fixJoy.Horizontal * speed, rig.velocity.y, fixJoy.Vertical * speed);
@@ -50,7 +41,6 @@ public class PlayerController : MonoBehaviour
                 }
                 else
                     anim.SetBool("RunBattle", true);
-                // JoyGoes = false;
             }
             else if (fixJoy.Horizontal == 0 && fixJoy.Vertical == 0)
             {
@@ -60,7 +50,6 @@ public class PlayerController : MonoBehaviour
                 }
                 else
                     anim.SetBool("RunBattle", false);
-                //  JoyGoes = true;
             }
         }
 
@@ -81,6 +70,10 @@ public class PlayerController : MonoBehaviour
             YouWinPan.SetActive(true);
             Finished = true;
         }
+        else if(other.tag == "Chest")
+        {
+
+        }
     }
     private void OnCollisionEnter(Collision collision)
     {
@@ -91,6 +84,7 @@ public class PlayerController : MonoBehaviour
     }
     public void Death()
     {
+        BossKilled = 0;
         anim.SetBool("Death", false);
         anim.SetBool("BattleStart", false);
         transform.position = Spawn.transform.position;
@@ -99,7 +93,14 @@ public class PlayerController : MonoBehaviour
         CanMove = true;
         Finished = false;
         Fight = false;
-
+        if(GameObject.FindGameObjectWithTag("ToDestroy") != null)
+        {
+            Destroy(GameObject.FindGameObjectWithTag("ToDestroy"));
+            if (GameObject.FindGameObjectWithTag("ToDestroy") != null)
+            {
+                Destroy(GameObject.FindGameObjectWithTag("ToDestroy"));
+            }
+        }
         AttackButton.SetActive(false);
         hpBarCanvas.SetActive(false);
     }
@@ -107,6 +108,7 @@ public class PlayerController : MonoBehaviour
     public void GoToFight()
     {
         Fight = true;
+        canAttack = true;
         YouWinPan.SetActive(false);
         anim.SetBool("BattleStart", true);
         transform.position = FightSpawn.transform.position;
@@ -114,23 +116,52 @@ public class PlayerController : MonoBehaviour
         hpBarCanvas.SetActive(true);
         Lifes = 10;
         HpBar.fillAmount = 1f;
+        Instantiate(bossPref, new Vector3(123, 0.5f, -4), Quaternion.Euler(0, 180, 0));
+        Instantiate(bossPref, new Vector3(117, 0.5f, -4), Quaternion.Euler(0, 180, 0));
     }
 
     public void GetDamaged()
     {
-        HpBar.fillAmount -= 0.1f;
-        Lifes-=1;
-        if(Lifes == 0)
+        if (!damaged)
         {
-            anim.SetBool("Death", true);
-            isDead = true;
-            YouLoosePan.SetActive(true);
-            CanMove = false;
+            damaged = true;
+            StartCoroutine(CanBeDamaged());
+            HpBar.fillAmount -= 0.1f;
+            Lifes-=1;
+            if(Lifes == 0)
+            {
+                anim.SetBool("Death", true);
+                isDead = true;
+                YouLoosePan.SetActive(true);
+                CanMove = false;
+            }
         }
     }
 
     public void Attack()
     {
+        if (canAttack)
+        {
+            AttackValue++;
+            canAttack = false;
+            StartCoroutine(AttackCont());
+            anim.SetInteger("Attack", AttackValue);
+            if(AttackValue == 2)
+            {
+                AttackValue = 0;
+            }
+        }
+    }
 
+    IEnumerator CanBeDamaged()
+    {
+        yield return new WaitForSeconds(0.5f);
+        damaged = false;
+    }
+    IEnumerator AttackCont()
+    {
+        yield return new WaitForSeconds(0.5f);
+        anim.SetInteger("Attack", 0);
+        canAttack = true;
     }
 }

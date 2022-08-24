@@ -722,7 +722,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 3
-  Dest: 8
+  Dest: 6
 --- !u!1 &162843644818056130
 GameObject:
   m_ObjectHideFlags: 0
