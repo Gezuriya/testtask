@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
     public bool isDead, Finished, CanMove, Fight, canAttack, damaged;
     [SerializeField] GameObject Spawn, FightSpawn, YouLoosePan, YouWinPan;
 
-    [SerializeField] GameObject AttackButton, hpBarCanvas, bossPref, chestButton;
+    [SerializeField] GameObject AttackButton, hpBarCanvas, bossPref, chestButton, chestPanel, Zamok;
     [SerializeField] Image HpBar;
     int Lifes;
     public int BossKilled;
@@ -177,6 +177,19 @@ public class PlayerController : MonoBehaviour
 
     public void ChestTrig()
     {
-
+        if (chestPanel.activeInHierarchy)
+        {
+            chestPanel.SetActive(false);
+        }
+        else
+        {
+            chestPanel.SetActive(true);
+            Zamok.GetComponent<SlotControl>().Upd();
+            FindObjectOfType<Inventory>().UpdEvery();
+        }
+    }
+    public void ExitGame()
+    {
+        Application.Quit();
     }
 }
